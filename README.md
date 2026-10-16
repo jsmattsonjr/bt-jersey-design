@@ -81,3 +81,10 @@ fixes the arm angle; the page state is `window.__jp`.
 `C-wil2mw.js`, served from `/_app/immutable/assets/`, checked 2026-10-14).
 `rider_f`, `rider_n` and `rider_low_lod` share its atlas. If the site ships a
 new hash, re-check the UVs against the template before replacing the file.
+
+## One-offs
+
+`oneoff/irn-bru-2/` redraws parts of a finished atlas from the model's 3D
+surface (straight sleeve and hem stripes, round logos, sliver triangles); its
+README covers what the UV map does to stripes and logos, which applies to any
+design.
