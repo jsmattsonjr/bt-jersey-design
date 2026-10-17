@@ -82,6 +82,21 @@ fixes the arm angle; the page state is `window.__jp`.
 `rider_f`, `rider_n` and `rider_low_lod` share its atlas. If the site ships a
 new hash, re-check the UVs against the template before replacing the file.
 
+## Render and check from the command line
+
+```zsh
+./render.zsh ATLAS.png [OUT.png] [VIEW...]   # contact sheet of the rider wearing it
+node check.mjs ATLAS.png [--map OUT.png]     # size, alpha, drawn texels outside the template
+```
+
+`render.zsh` screenshots `render.html` in headless Chrome (no puppeteer), one
+tile per view: `front back left right three top`, the `-close` variants of the
+first four, or `px,py,pz,tx,ty,tz`. The default is the four close views, and
+`BASIC=1` renders unlit. The rider faces +x, with the left arm at −z.
+`check.mjs` exits 1 on a warning: drawn texels with alpha under 255, or
+near-black texels outside the template (the front neckline V). The
+`jersey-design` skill in `~/Biketerra/.claude/skills/` covers the whole workflow.
+
 ## One-offs
 
 `oneoff/irn-bru-2/` redraws parts of a finished atlas from the model's 3D

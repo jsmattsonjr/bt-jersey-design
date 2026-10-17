@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- One still of the rider wearing an atlas, for render.zsh (headless Chrome).
+     ?atlas=URL&view=NAME|px,py,pz,tx,ty,tz[&basic=1][&bg=%23rrggbb] -->
+<html><head><meta charset="utf-8"><title>Jersey render</title>
+<style>html,body{margin:0;height:100%}#p{width:100vw;height:100vh}</style></head>
+<body><div id="p"></div>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { createPreview } from './src/preview.js';
+const q = new URLSearchParams(location.search);
+const el = document.getElementById('p');
+el.style.setProperty('--preview-bg', q.get('bg') || '#ffffff');
+const pv = await createPreview(el, './assets/rider_m.glb');
+const img = new Image();
+img.src = q.get('atlas');
+await img.decode();
+const c = document.createElement('canvas');
+c.width = c.height = 512;
+const x = c.getContext('2d');
+x.drawImage(img, 0, 0, 512, 512); // as the site does: any size is squashed to 512²
+pv.setJersey(x.getImageData(0, 0, 512, 512));
+// basic=1: unlit, so colours read as the atlas holds them.
+if (q.get('basic')) pv.riding.material = new THREE.MeshBasicMaterial({ map: pv.riding.material.map, side: THREE.DoubleSide });
+// The rider faces +x and their left arm is at -z. Close views frame the torso.
+const VIEWS = {
+  front: [[2.6, 1.3, 0], [0.1, 1.2, 0]],
+  back: [[-2.6, 1.3, 0], [0.1, 1.2, 0]],
+  left: [[0.0, 1.3, -2.6], [0.1, 1.2, 0]],
+  right: [[0.0, 1.3, 2.6], [0.1, 1.2, 0]],
+  three: [[2.6, 1.5, 0.9], [0.15, 1.15, 0]],
+  'front-close': [[1.6, 1.17, 0], [0.0, 1.17, 0]],
+  'back-close': [[-1.6, 1.17, 0], [0.0, 1.17, 0]],
+  'left-close': [[0.0, 1.35, -1.3], [0.0, 1.3, -0.1]],
+  'right-close': [[0.0, 1.35, 1.3], [0.0, 1.3, 0.1]],
+  'top': [[0.3, 2.8, 0], [0.0, 1.2, 0]],
+};
+const v = q.get('view') || 'three';
+if (VIEWS[v]) pv.look(VIEWS[v]);
+else { const n = v.split(',').map(Number); pv.look([n.slice(0, 3), n.slice(3, 6)]); }
+// Let OrbitControls damping settle before the screenshot.
+await new Promise((r) => setTimeout(r, 400));
+document.title = 'ready';
+</script></body></html>
