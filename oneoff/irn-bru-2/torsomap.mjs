@@ -4,10 +4,11 @@ const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
 const { loadRig } = await import(R + 'src/pipeline.js');
 const { rasterTriangle } = await import(R + 'src/view.js');
-export function torsoMap(S = 512, ss = 1) {
+// pose(rig) poses it (default: bind pose); the posed rig comes back as .rig.
+export function torsoMap(S = 512, ss = 1, pose = (rig) => rig.reset()) {
   const buf = readFileSync(R + 'assets/rider_m.glb');
   const glb = parseGLB(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
-  const rig = loadRig(glb); rig.reset();
+  const rig = loadRig(glb); pose(rig);
   const { position: P, normal: N } = rig.skin();
   const UV = glb.uv, T = rig.jerseyTris, N2 = S * ss;
   const out = { S: N2, on: new Uint8Array(N2*N2), wpos: new Float32Array(N2*N2*3), nrm: new Float32Array(N2*N2*3) };
@@ -19,5 +20,5 @@ export function torsoMap(S = 512, ss = 1) {
       for (let i = 0; i < 3; i++) { out.wpos[k*3+i] = b0*P[a*3+i]+b1*P[b*3+i]+b2*P[c*3+i]; out.nrm[k*3+i] = b0*N[a*3+i]+b1*N[b*3+i]+b2*N[c*3+i]; }
     });
   }
-  return out;
+  return { ...out, rig };
 }

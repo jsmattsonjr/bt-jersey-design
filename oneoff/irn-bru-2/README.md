@@ -11,6 +11,9 @@ specific to this design: layer names, positions and colours are hard-coded.
 ./run.sh IN.png IN.psd OUT.png WORKDIR    # explicit paths; WORKDIR keeps the stages
 ```
 
+The other stages still measure in bind pose (`rider_m`'s own), which is not
+what the settings preview shows; see `../chrono/README.md`.
+
 Needs node and the shared venv (`psd-tools`, Pillow). Rerunning on the
 unchanged inputs reproduces the saved PNG pixel for pixel.
 
@@ -22,7 +25,7 @@ unchanged inputs reproduces the saved PNG pixel for pixel.
 | `build.mjs` | Sleeves. Orange/white/blue bands are rings at fixed distances along the upper-arm bone (stripe centre 15.3 cm, `STRIPE`; half-width 4 mm, `HALF`). The logo (Layer 17) is projected flat along the surface normal at its centre: `LOGO_CM` diameter, `BOOST` alpha gain, `DIL` line thickening in logo pixels. Each logo's orientation is set in the `frames` block. |
 | `torso.mjs` | Chest stripe levelled at one bind-pose height (old stripe's mean, 1.2933 m, 11.8 mm wide). The IRN-BRU lettering keeps a constant 3D gap above it. |
 | `hem.mjs` | Hem stripe: white within 11.8 mm (`W`) of the hem edge, measured in 3D from the mesh's bottom boundary. The hem is not level, so the stripe follows it rather than a height. |
-| `side.mjs` | ORIGINAL & BEST: old text erased, reprojected upright on each flank, centred between the stripes, in the emblem's navy (20, 22, 41). |
+| `side.mjs` | ORIGINAL & BEST: old text erased, reprojected on each flank, centred between the stripes, in the emblem's navy (20, 22, 41). Centre and size are found in bind pose; the projection is made in the settings page's stopped pose (`../chrono/pose.mjs`, `POSE=`), square to the torso axis, so the text runs straight there. Projected upright in bind pose, it curved on the right flank in the preview. |
 | `emblem.mjs` | Front and back roundels: old ones erased, reprojected round and centred between the stripes, `SCALE=0.9` of the old size. |
 
 `posmap.mjs` and `torsomap.mjs` rasterise the sleeve and torso triangles into

@@ -8,11 +8,11 @@ const { parseGLB } = await import(R + 'src/glb.js');
 const CLIP = { stopped: 'mount', seated: 'pedal.seated', standing: 'pedal.standing' };
 export const POSE = process.env.POSE || 'stopped';
 
-export function posed(rig) {
-  if (POSE === 'bind') return rig.reset();
+export function posed(rig, pose = POSE) {
+  if (pose === 'bind') return rig.reset();
   const b = readFileSync(R + 'assets/rider_low_lod.glb');
   const lod = parseGLB(b.buffer.slice(b.byteOffset, b.byteOffset + b.length));
-  rig.applyClip(lod.animations[CLIP[POSE]], Number(process.env.T || 0));
+  rig.applyClip(lod.animations[CLIP[pose]], Number(process.env.T || 0));
 }
 
 // World position of a bone.

@@ -1,19 +1,25 @@
 // Side text: erase the old ORIGINAL & BEST, then project each layer flat onto
-// its flank (vertical = world up, bind pose), centred in height between the
-// stripes, recoloured to the emblem lettering's navy.
+// its flank, centred in height between the stripes, recoloured to the emblem
+// lettering's navy. The centre and size are found in bind pose (where the
+// stripe heights were measured); the projection is made in POSE (default
+// stopped, the settings page's static preview), square to the torso axis
+// (spine.1 to spine.3), so the text runs straight in the pose the user sees.
 import { torsoMap } from './torsomap.mjs';
+import { posed, POSE, at as boneAt } from '../chrono/pose.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { readPNG, writePNG } = await import(R + 'test/png.js');
 const [,, inPath, outPath, layerDir = '.'] = process.argv;
 const NAVY = [20, 22, 41], ORANGE = [245, 125, 25];
 const YC = 1.2933, HALF = 0.0059, HEM_W = 0.0118;
 const SCALE = Number(process.env.SCALE || 1);
-const img = readPNG(inPath), S = 512, SS = 4, N = S * SS, m = torsoMap(S, SS);
+const img = readPNG(inPath), S = 512, SS = 4, N = S * SS, m = torsoMap(S, SS), ms = torsoMap(S, SS, (rig) => posed(rig, POSE));
 const layers = [{ name: 'Layer11', x: 242, y: 378 }, { name: 'Layer12', x: 32, y: 379 }].map((l) => ({ ...l, im: readPNG(layerDir + '/' + l.name + '.png') }));
 const sub = (a, b) => a.map((q, i) => q - b[i]), dot = (a, b) => a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
 const norm = (a) => { const l = Math.hypot(...a); return a.map((q) => q / l); };
 const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
-const at = (x, y) => { const k = Math.round(y*SS)*N + Math.round(x*SS); return m.on[k] ? { p: [0,1,2].map((i) => m.wpos[k*3+i]), n: norm([0,1,2].map((i) => m.nrm[k*3+i])) } : null; };
+const atIn = (mm) => (x, y) => { const k = Math.round(y*SS)*N + Math.round(x*SS); return mm.on[k] ? { p: [0,1,2].map((i) => mm.wpos[k*3+i]), n: norm([0,1,2].map((i) => mm.nrm[k*3+i])) } : null; };
+const at = atIn(m), atS = atIn(ms);
+const AXIS = norm(sub(boneAt(ms.rig, 'spine.3'), boneAt(ms.rig, 'spine.1'))); // torso axis in POSE
 
 
 const out = Uint8ClampedArray.from(img.data);
@@ -34,12 +40,13 @@ for (const l of layers) {
   let low = 9; for (let y = 400; y < S; y++) { const s = at(cx, y + 0.5); if (s) low = Math.min(low, s.p[1]); }
   const hc = ((low + HEM_W) + (YC - HALF)) / 2;
   // Surface point in this column at height hc.
-  let best = null; for (let y = 300; y < S; y += 0.25) { const s = at(cx, y); if (s && (!best || Math.abs(s.p[1] - hc) < Math.abs(best.p[1] - hc))) best = s; }
-  const n0 = best.n, up = norm(sub([0,1,0], n0.map((q) => q * n0[1])));
-  const hz = norm(cross(up, n0)); // horizontal tangent
+  let best = null, by = 0; for (let y = 300; y < S; y += 0.25) { const s = at(cx, y); if (s && (!best || Math.abs(s.p[1] - hc) < Math.abs(best.p[1] - hc))) { best = s; by = y; } }
+  // That texel in POSE: the frame is built there.
+  const ps = atS(cx, by), n0 = ps.n, up = norm(sub(AXIS, n0.map((q) => q * dot(AXIS, n0))));
+  const hz = norm(cross(up, n0)); // across the torso
   // Sign: keep the layer's u direction as it ran on the body.
-  const du = sub(rt.p, lf.p), sgn = Math.sign(dot(du, hz));
-  l.f = { P0: best.p, n0, eu: hz.map((q) => q * sgn), ev: up.map((q) => -q) };
+  const du = sub(atS(l.x + l.im.width - 0.5, cy).p, atS(l.x + 0.5, cy).p), sgn = Math.sign(dot(du, hz));
+  l.f = { P0: ps.p, n0, eu: hz.map((q) => q * sgn), ev: up.map((q) => -q) };
   l.k = (l.im.height / hgt) / SCALE; // layer px per metre, from the old height
   console.log(l.name, 'old height', (hgt*100).toFixed(1), 'cm width', (wid*100).toFixed(1), 'cm; hem', low.toFixed(3), 'centre h', hc.toFixed(3), 'gap', ((YC-HALF-low-HEM_W)*100).toFixed(1), 'cm; aspect px/m h', (l.im.height/hgt).toFixed(0), 'w', (l.im.width/wid).toFixed(0));
 }
@@ -51,8 +58,8 @@ function alphaAt(im, x, y) {
 // 3. Project.
 const acc = new Float32Array(S*S), cnt = new Uint16Array(S*S);
 for (let y = 300 * SS; y < N; y++) for (let x = 0; x < N; x++) {
-  const k = y*N + x; if (!m.on[k]) continue;
-  const p = [m.wpos[k*3], m.wpos[k*3+1], m.wpos[k*3+2]], n = norm([m.nrm[k*3], m.nrm[k*3+1], m.nrm[k*3+2]]);
+  const k = y*N + x; if (!ms.on[k]) continue;
+  const p = [ms.wpos[k*3], ms.wpos[k*3+1], ms.wpos[k*3+2]], n = norm([ms.nrm[k*3], ms.nrm[k*3+1], ms.nrm[k*3+2]]);
   let a = 0;
   for (const l of layers) {
     const rel = sub(p, l.f.P0); if (dot(n, l.f.n0) < 0.3 || Math.abs(dot(rel, l.f.n0)) > 0.05) continue;
