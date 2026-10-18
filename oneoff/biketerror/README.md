@@ -29,6 +29,8 @@ unchanged inputs reproduces the saved PNG pixel for pixel.
 - **Side text** (BIKETERRA, Layers 11 and 12) slanted along the left flank in
   stopped; projected square to the torso it now runs straight.
 - **The back art** is Layer 14, which replaced Layers 8 and 13 (both now
-  hidden in the PSD). It is 16.0 × 21.9 cm on the body.
+  hidden in the PSD). It is 16.0 × 21.9 cm on the body, and mirrored left to
+  right (`FLIP` in `extract.py`) so the cyclist faces right; the PSD layer
+  itself faces left.
 - The pose is asymmetric, so the two BIKETERRA layers measure 18.8 and 18.3 cm
   long; each keeps its own length.
