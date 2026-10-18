@@ -1,5 +1,6 @@
-// Bind-pose position of every sleeve texel, in its upper-arm bone frame.
+// Position of every sleeve texel in the pose from pose.mjs, in its upper-arm bone frame.
 import { readFileSync } from 'node:fs';
+import { posed } from './pose.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
 const { loadRig } = await import(R + 'src/pipeline.js');
@@ -10,7 +11,7 @@ export function sleeveMap(S = 512, ss = 1) {
   const buf = readFileSync(R + 'assets/rider_m.glb');
   const glb = parseGLB(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
   const rig = loadRig(glb);
-  rig.reset();
+  posed(rig);
   const { position: P, normal: N } = rig.skin();
   const UV = glb.uv, T = rig.jerseyTris, N2 = S * ss;
   // side per texel: 0 none, 1 = left island (x<0.31), 2 = right

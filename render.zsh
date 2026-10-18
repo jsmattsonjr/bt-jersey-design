@@ -4,7 +4,9 @@
 #   ./render.zsh ATLAS.png [OUT.png] [VIEW...]
 # Views are render.html names (front back left right three front-close
 # back-close left-close right-close top) or px,py,pz,tx,ty,tz. Default: the four
-# close views. BASIC=1 renders unlit; SIZE sets each tile (700).
+# close views. POSE=bind|stopped|seated|standing (default stopped, the settings
+# page's static pose) and T=seconds into the pedalling clips; BASIC=1 renders
+# unlit; SIZE sets each tile (700).
 set -e
 here=${0:A:h}
 atlas=${1:?usage: render.zsh ATLAS.png [OUT.png] [VIEW...]}
@@ -29,7 +31,7 @@ for v in $views; do
   t=$w/tile-$#tiles.png
   "$chrome" --headless=new --use-angle=metal --hide-scrollbars --window-size=$size,$size \
     --virtual-time-budget=15000 --screenshot=$t \
-    "http://localhost:$port/render.html?atlas=atlas.png&view=$v${BASIC:+&basic=1}" >/dev/null 2>&1
+    "http://localhost:$port/render.html?atlas=atlas.png&view=$v&pose=${POSE:-stopped}&t=${T:-0}${BASIC:+&basic=1}" >/dev/null 2>&1
   tiles+=($t)
 done
 ~/Biketerra/.venv/bin/python - $out $tiles <<'PY'

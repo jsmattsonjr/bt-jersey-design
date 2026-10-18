@@ -5,6 +5,7 @@
 //   node sleeves.mjs IN.png OUT.png WORKDIR
 import { readFileSync } from 'node:fs';
 import { sleeveMap } from './posmap.mjs';
+import { POSE } from './pose.mjs';
 import { frame, over, bleed, sub, dot, norm, cross } from './decal.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { readPNG, writePNG } = await import(R + 'test/png.js');
@@ -34,10 +35,11 @@ for (const [side, name] of [[1, 'Layer5'], [2, 'Layer4']]) {
   console.log(name, l.f.info);
   // OUTSIDE (default on): move the roundel round the arm, at the same distance
   // along the bone, to the point whose normal faces most directly outward
-  // (world -z for the left arm, +z for the right), keeping its size and its
-  // orientation relative to the arm.
+  // (the rider's left, from the right shoulder joint to the left, for the left arm), keeping
+  // its size and its orientation relative to the arm.
   if (process.env.OUTSIDE !== '0') {
-    const r = rot[side === 1 ? 'l' : 'r'], lat = new Vector3(0, 0, side === 1 ? -1 : 1).applyMatrix3(r);
+    const sh = (s) => new Vector3().setFromMatrixPosition(m.rig.bones.get(`upperArm.${s}`).matrixWorld);
+    const r = rot[side === 1 ? 'l' : 'r'], lat = sh('l').sub(sh('r')).multiplyScalar(side === 1 ? 1 : -1).normalize().applyMatrix3(r);
     const lxz = norm([lat.x, 0, lat.z]), f = l.f;
     let best = null, bs = -2;
     for (let k = 0; k < N * N; k += 1) {
@@ -54,6 +56,9 @@ for (const [side, name] of [[1, 'Layer5'], [2, 'Layer4']]) {
   }
   logos[side] = l;
 }
+// One size for both: the stopped pose is asymmetric, so the old chords differ by side.
+{ const k = (logos[1].f.k + logos[2].f.k) / 2; for (const sd of [1, 2]) logos[sd].f.k = k; console.log('roundels', (logos[1].im.width / k * 100).toFixed(1), 'cm'); }
+console.log('pose', POSE);
 const colourAt = (side, p, n) => over(p[1] > CUFF ? YELLOW : NAVY, logos[side], p, n, 0.04);
 
 const rgb = new Float32Array(S * S * 3), cnt = new Float32Array(S * S), sub4 = new Float32Array(N * N * 3);

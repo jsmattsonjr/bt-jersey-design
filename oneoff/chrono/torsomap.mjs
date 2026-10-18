@@ -1,5 +1,6 @@
-// Bind-pose world position and normal of every torso texel (v below the sleeves).
+// World position and normal of every torso texel (v below the sleeves), in the pose from pose.mjs.
 import { readFileSync } from 'node:fs';
+import { posed } from './pose.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
 const { loadRig } = await import(R + 'src/pipeline.js');
@@ -7,7 +8,7 @@ const { rasterTriangle } = await import(R + 'src/view.js');
 export function torsoMap(S = 512, ss = 1) {
   const buf = readFileSync(R + 'assets/rider_m.glb');
   const glb = parseGLB(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
-  const rig = loadRig(glb); rig.reset();
+  const rig = loadRig(glb); posed(rig);
   const { position: P, normal: N } = rig.skin();
   const UV = glb.uv, T = rig.jerseyTris, N2 = S * ss;
   const out = { S: N2, on: new Uint8Array(N2*N2), wpos: new Float32Array(N2*N2*3), nrm: new Float32Array(N2*N2*3) };

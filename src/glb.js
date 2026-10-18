@@ -65,5 +65,13 @@ export function parseGLB(buffer) {
     index: prim.indices !== undefined ? accessor(prim.indices) : null,
     skinJoints: skin.joints,
     inverseBind: accessor(skin.inverseBindMatrices),
+    // Clips by name: each channel targets a node by name, with keyframe times
+    // and values (LINEAR in the rider files).
+    animations: Object.fromEntries((json.animations || []).map((a) => [a.name, a.channels.map((c) => ({
+      node: json.nodes[c.target.node].name,
+      path: c.target.path,
+      times: accessor(a.samplers[c.sampler].input),
+      values: accessor(a.samplers[c.sampler].output),
+    }))])),
   };
 }

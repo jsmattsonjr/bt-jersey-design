@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- One still of the rider wearing an atlas, for render.zsh (headless Chrome).
-     ?atlas=URL&view=NAME|px,py,pz,tx,ty,tz[&basic=1][&bg=%23rrggbb] -->
+     ?atlas=URL&view=NAME|px,py,pz,tx,ty,tz[&pose=bind|stopped|seated|standing][&t=SEC][&basic=1][&bg=%23rrggbb] -->
 <html><head><meta charset="utf-8"><title>Jersey render</title>
 <style>html,body{margin:0;height:100%}#p{width:100vw;height:100vh}</style></head>
 <body><div id="p"></div>
@@ -35,8 +35,13 @@ const VIEWS = {
   'right-close': [[0.0, 1.35, 1.3], [0.0, 1.3, 0.1]],
   'top': [[0.3, 2.8, 0], [0.0, 1.2, 0]],
 };
+// pose: as the settings page shows it (default bind, the GLB's own pose).
+// Named views follow the chest, so they frame the torso in any pose.
+const CLIP = { stopped: 'mount', seated: 'pedal.seated', standing: 'pedal.standing' };
+const pose = q.get('pose') || 'bind';
+const d = CLIP[pose] ? await pv.setPose('./assets/rider_low_lod.glb', CLIP[pose], Number(q.get('t') || 0)) : new THREE.Vector3();
 const v = q.get('view') || 'three';
-if (VIEWS[v]) pv.look(VIEWS[v]);
+if (VIEWS[v]) pv.look(VIEWS[v].map((p) => [p[0] + d.x, p[1] + d.y, p[2] + d.z]));
 else { const n = v.split(',').map(Number); pv.look([n.slice(0, 3), n.slice(3, 6)]); }
 // Let OrbitControls damping settle before the screenshot.
 await new Promise((r) => setTimeout(r, 400));

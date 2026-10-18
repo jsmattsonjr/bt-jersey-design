@@ -1,11 +1,14 @@
 // Torso: navy with a yellow hem stripe within W of the hem edge (3D distance
-// to the mesh's bottom boundary, bind pose), then every torso art layer
-// projected flat along the surface normal at its old centre, square to world
-// up, at its old 3D size, composited in PSD order. Supersampled 4x4 per texel.
+// to the mesh's bottom boundary), then every torso art layer projected flat
+// along the surface normal at its old centre, square to the torso's axis
+// (spine.1 to spine.3; TORSO_UP=world for world up), at its old 3D size,
+// composited in PSD order. All in the pose from pose.mjs (default stopped).
+// Supersampled 4x4 per texel.
 //   node torso.mjs IN.png OUT.png WORKDIR
 import { readFileSync } from 'node:fs';
 import { torsoMap } from './torsomap.mjs';
-import { frame, over, bleed, norm } from './decal.mjs';
+import { frame, over, bleed, norm, sub } from './decal.mjs';
+import { posed, at as boneAt } from './pose.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
 const { loadRig, templateMask } = await import(R + 'src/pipeline.js');
@@ -21,7 +24,7 @@ const img = readPNG(inPath), S = 512, SS = 4, N = S * SS, m = torsoMap(S, SS);
 // since UV seams split vertices), low in the atlas and running round the body.
 const buf = readFileSync(R + 'assets/rider_m.glb');
 const glb = parseGLB(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
-const rig = loadRig(glb); rig.reset();
+const rig = loadRig(glb); posed(rig);
 const { position: P } = rig.skin();
 const UV = glb.uv, T = rig.jerseyTris;
 const key = (i) => [0,1,2].map((c) => P[i*3+c].toFixed(5)).join();
@@ -57,11 +60,14 @@ if (!W) {
 }
 console.log('hem stripe W', (W * 100).toFixed(2), 'cm');
 
+// Art "up": the torso's axis in this pose, so the art sits square to the body.
+const UP = process.env.TORSO_UP === 'world' ? [0, 1, 0] : norm(sub(boneAt(rig, 'spine.3'), boneAt(rig, 'spine.1')));
+console.log('art up', UP.map((q) => q.toFixed(3)).join(','));
 // Art layers on the torso, in PSD order, each confined to its own island.
 const layers = JSON.parse(readFileSync(work + '/layers.json')).filter((l) => l.y > 225).map((l) => ({ ...l, im: readPNG(work + '/' + l.file), back: l.x + l.w / 2 < SPLIT }));
 for (const l of layers) {
   const at = (x, y) => { if ((x < SPLIT) !== l.back) return null; const k = Math.round(y*SS)*N + Math.round(x*SS); return m.on[k] ? { p: [0,1,2].map((i) => m.wpos[k*3+i]), n: norm([0,1,2].map((i) => m.nrm[k*3+i])) } : null; };
-  l.f = frame(at, l, [0, 1, 0]);
+  l.f = frame(at, l, UP);
   console.log(l.name, l.back ? 'back ' : 'front', l.f.info);
 }
 

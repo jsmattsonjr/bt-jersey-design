@@ -1,4 +1,4 @@
-// 3D preview: the rider as Biketerra draws it (riding pose, nearest-filtered
+// 3D preview: the rider as Biketerra draws it (bind pose or a site pose, nearest-filtered
 // 512 texture, palette row repainted), or in the A-pose used for the bake.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -71,6 +71,28 @@ export async function createPreview(container, glbUrl) {
     gltf.scene.visible = !on;
   }
 
+  // Pose the rider as the site's avatar preview does: rider_m rebound to the
+  // low-LOD rider's skeleton, which an AnimationMixer drives. Stopped is the
+  // `mount` clip held at time 0; seated and standing play `pedal.seated` and
+  // `pedal.standing`, here frozen at time t. Returns how far the chest bone
+  // moved from the bind pose, so callers can reframe.
+  // (GLTFLoader drops the dots from node names: spine.3 is spine3.)
+  const chest = () => riding.skeleton.getBoneByName('spine3').getWorldPosition(new THREE.Vector3());
+  const bindChest = chest();
+  async function setPose(lodUrl, clipName, t = 0) {
+    const lod = await new GLTFLoader().loadAsync(lodUrl);
+    let lodMesh = null;
+    lod.scene.traverse((o) => { if (o.isSkinnedMesh) lodMesh = o; });
+    lod.scene.visible = false;
+    scene.add(lod.scene);
+    const mixer = new THREE.AnimationMixer(lod.scene);
+    mixer.clipAction(THREE.AnimationClip.findByName(lod.animations, clipName)).play();
+    mixer.setTime(t);
+    riding.bind(lodMesh.skeleton, lodMesh.bindMatrix);
+    scene.updateMatrixWorld(true);
+    return chest().sub(bindChest);
+  }
+
   function resize() {
     const w = container.clientWidth, h = container.clientHeight;
     renderer.setSize(w, h, false);
@@ -98,5 +120,5 @@ export async function createPreview(container, glbUrl) {
 
   setJersey(null);
   renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
-  return { setJersey, setAPose, showAPose, look, riding };
+  return { setJersey, setAPose, showAPose, setPose, look, riding };
 }
