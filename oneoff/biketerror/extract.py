@@ -16,7 +16,7 @@ from psd_tools import PSDImage
 
 psd, out = PSDImage.open(sys.argv[1]), Path(sys.argv[2])
 out.mkdir(parents=True, exist_ok=True)
-ART = ('Layer 2', 'Layer 9', 'Layer 10', 'Layer 11', 'Layer 12', 'Layer 3', 'Layer 7', 'Layer 8')
+ART = ('Layer 2', 'Layer 9', 'Layer 10', 'Layer 11', 'Layer 12', 'Layer 3', 'Layer 7', 'Layer 13')
 BANDS = {'Layer 4': 'hem.png', 'Layer 5': 'cuff.png', 'Layer 6': 'cuff.png'}
 canvas = {}
 rows = []
