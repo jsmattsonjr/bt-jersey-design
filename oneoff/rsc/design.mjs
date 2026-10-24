@@ -90,7 +90,7 @@ for (const s of ['l', 'r']) {
   const nf = toW([0.03, 0.505, sg * NECKF]), nb = toW([-0.015, 0.525, sg * NECKB]), a = armpit[s];
   let n = norm(cross(sub(nb, nf), sub(a, nf)));
   if (dot(n, sub(toW([0.03, 0.45, sg * 0.15]), nf)) < 0) n = scale(n, -1);
-  const u0 = body(nf)[1], u1 = body(a)[1], BOW = cm('BOW', -1.5);
+  const u0 = body(nf)[1], u1 = body(a)[1], BOW = cm('BOW', 1.5);
   ragl[s] = (p) => { const t = Math.max(0, Math.min(1, (u0 - body(p)[1]) / (u0 - u1))); return dot(n, sub(p, nf)) - BOW * 4 * t * (1 - t); };
 }
 

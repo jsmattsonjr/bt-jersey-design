@@ -32,7 +32,7 @@ Colours are the PDF's swatches: plum 2623Q (75,21,65), magenta 240Q
 
 - **Yoke** (plum): the sleeves, plus the torso beyond a raglan plane through
   the side of the neck (front `NECKF` 6.5, back `NECKB` 5 out) and the
-  armpit. It is bowed by `BOW` -1.5 cm, so the seam hugs the shoulder as in
+  armpit. It is bowed `BOW` 1.5 cm out toward the shoulder, as in
   the mockup.
 - **Side panel** (magenta, `PANEL` 8.5 wide): within PANEL/2 of the side
   line from the hem to the armpit, then along the underside of the sleeve
