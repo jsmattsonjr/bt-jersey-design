@@ -77,6 +77,12 @@ fixes the arm angle; the page state is `window.__jp`.
 
 ## Requirements
 
+First fetch the rider models (they are not in the repo; see Model):
+
+```zsh
+./fetch-assets.zsh
+```
+
 - **node** 20 or later, for the scripts and tests (no npm packages; three.js is in `vendor/`).
 - **Google Chrome**, for `render.zsh` (headless). It defaults to the macOS app
   path; set `CHROME` to the binary elsewhere.
@@ -88,6 +94,7 @@ fixes the arm angle; the page state is `window.__jp`.
   ```zsh
   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
   ```
+- **curl** and **shasum**, for `fetch-assets.zsh`.
 - **poppler** (`pdftoppm`), only for `oneoff/rsc`, which reads a PDF mockup.
 
 ## Layout
@@ -95,16 +102,17 @@ fixes the arm angle; the page state is `window.__jp`.
 | Path | What |
 |---|---|
 | `skill/SKILL.md` | The `jersey-design` Claude Code skill: the whole workflow, the model's distortions, recipes. Link it as `.claude/skills/jersey-design/SKILL.md` in the project you work from. |
-| `assets/` | The rider models and the template mask (see Model). |
+| `assets/` | The template mask, and the rider models once `fetch-assets.zsh` has downloaded them (ignored by git). |
 | `design/templates/jersey.png` | The jersey template; islands are white at alpha 0. Same file as `assets/jersey-mask.png`. |
 | `design/jerseys/` | Inputs and outputs of the one-offs, and the test's UV guide. |
 | `oneoff/<name>/` | One script set per finished jersey; each `run.sh` rebuilds its PNG from `design/jerseys/` pixel for pixel. |
 
 ## Model
 
-Both GLBs are the site's own, from `https://biketerra.com/_app/immutable/assets/`
-(referenced from bundle chunk `chunks/DqME4VGv.js`; byte-identical on
-2026-10-24):
+Both GLBs are the site's own, so the repo does not carry them.
+`fetch-assets.zsh` downloads them from `https://biketerra.com/_app/immutable/assets/`
+(referenced from bundle chunk `chunks/DqME4VGv.js` on 2026-10-24) and checks
+each against the SHA-256 it had when the tools were measured on it:
 
 - `assets/rider_m.glb` is `rider_m.rb1Dgf6L.glb`, the mesh and UVs.
 - `assets/rider_low_lod.glb` is `rider_low_lod.Ct7jtfaL.glb`. The settings
@@ -113,7 +121,8 @@ Both GLBs are the site's own, from `https://biketerra.com/_app/immutable/assets/
 
 `rider_f` (`rider_f.BP7jrp9H.glb`), `rider_n` (`rider_n.DZTihLVo.glb`) and
 `rider_low_lod` share the atlas. If the site ships a new hash, re-check the
-UVs against the template before replacing a file. To find the current names,
+UVs against the template, then update the names and hashes in
+`fetch-assets.zsh`. To find the current names,
 fetch `https://biketerra.com/`, follow the `_app/immutable/` imports, and grep
 for `rider_[a-z_]*\.[A-Za-z0-9_-]+\.glb`.
 

@@ -28,7 +28,8 @@ Chrome, a Python with `requirements.txt`).
   Antialias by supersampling (4×4 per texel) when painting, never by blurring
   afterwards.
 - One atlas serves `rider_m`, `rider_f`, `rider_n` and the low-LOD rider.
-  `assets/rider_m.glb` is the model all the tools use. **Its bind pose is not
+  `assets/rider_m.glb` is the model all the tools use (`./fetch-assets.zsh`
+  downloads it and `rider_low_lod.glb` from biketerra.com). **Its bind pose is not
   what the user sees.** The settings page rebinds `rider_m` to the skeleton of
   `assets/rider_low_lod.glb` and drives it with that file's clips. **Stopped**
   is `mount` held at t=0 and is static. **Seated** and **standing** play

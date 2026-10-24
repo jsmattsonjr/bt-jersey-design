@@ -12,7 +12,9 @@ and the art is cut out of the PDF and projected flat onto the body.
 ```
 
 Needs node, `pdftoppm` and the shared venv (Pillow). Rerunning reproduces the
-saved PNG pixel for pixel.
+saved PNG pixel for pixel. The PDF is a client's mockup and is not in the
+public repository (github.com/jsmattsonjr/bt-jersey-design), so there `run.sh`
+has no input; the scripts stand as an example of painting from a PDF.
 
 ## Stages
 
