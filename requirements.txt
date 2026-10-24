@@ -1,2 +1,4 @@
 Pillow
 psd-tools
+numpy
+scipy

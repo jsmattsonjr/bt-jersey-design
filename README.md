@@ -150,5 +150,8 @@ design.
 
 The others repaint the whole atlas in the settings page's stopped pose:
 `oneoff/chrono/` and `oneoff/biketerror/` redraw every PSD layer flat on the
-body, and `oneoff/rsc/` paints a jersey with no atlas at all, from a PDF
-mockup's panels and art.
+body. `oneoff/rsc/` paints a jersey with no atlas at all, from a PDF
+mockup's panels and art. `oneoff/chasing-the-sun/` does the same from a
+raster image mockup (front and back views, side and shoulder flats),
+mapping the views by arc length and scattering the flats' leaves and
+snowflakes as sprites.
