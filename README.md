@@ -5,7 +5,7 @@ side on a dark backdrop) into a Biketerra jersey UV map, by projecting each
 view onto the rider model and baking it into the atlas.
 
 ```bash
-cd ~/Biketerra/code/tools/jersey-projector
+cd jersey-projector
 python3 -m http.server 8000      # then open http://localhost:8000
 ```
 
@@ -75,12 +75,47 @@ the second argument to keep the renders and atlases.
 `?mockup=URL` (repeatable) on the page URL loads images at start, and `?arm=N`
 fixes the arm angle; the page state is `window.__jp`.
 
+## Requirements
+
+- **node** 20 or later, for the scripts and tests (no npm packages; three.js is in `vendor/`).
+- **Google Chrome**, for `render.zsh` (headless). It defaults to the macOS app
+  path; set `CHROME` to the binary elsewhere.
+- **Python 3 with `requirements.txt`** (Pillow, psd-tools), for the contact
+  sheet and the one-offs' layer extraction. The zsh scripts use `$PYTHON`,
+  else `.venv/bin/python` in the repo root (a venv, or a symlink to one;
+  ignored by git), else `python3`:
+
+  ```zsh
+  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+  ```
+- **poppler** (`pdftoppm`), only for `oneoff/rsc`, which reads a PDF mockup.
+
+## Layout
+
+| Path | What |
+|---|---|
+| `skill/SKILL.md` | The `jersey-design` Claude Code skill: the whole workflow, the model's distortions, recipes. Link it as `.claude/skills/jersey-design/SKILL.md` in the project you work from. |
+| `assets/` | The rider models and the template mask (see Model). |
+| `design/templates/jersey.png` | The jersey template; islands are white at alpha 0. Same file as `assets/jersey-mask.png`. |
+| `design/jerseys/` | Inputs and outputs of the one-offs, and the test's UV guide. |
+| `oneoff/<name>/` | One script set per finished jersey; each `run.sh` rebuilds its PNG from `design/jerseys/` pixel for pixel. |
+
 ## Model
 
-`assets/rider_m.glb` is the site's `rider_m.rb1Dgf6L.glb` (bundle chunk
-`C-wil2mw.js`, served from `/_app/immutable/assets/`, checked 2026-10-14).
-`rider_f`, `rider_n` and `rider_low_lod` share its atlas. If the site ships a
-new hash, re-check the UVs against the template before replacing the file.
+Both GLBs are the site's own, from `https://biketerra.com/_app/immutable/assets/`
+(referenced from bundle chunk `chunks/DqME4VGv.js`; byte-identical on
+2026-10-24):
+
+- `assets/rider_m.glb` is `rider_m.rb1Dgf6L.glb`, the mesh and UVs.
+- `assets/rider_low_lod.glb` is `rider_low_lod.Ct7jtfaL.glb`. The settings
+  page rebinds `rider_m` to its skeleton and poses it with its clips: stopped
+  (`mount` at t=0), seated and standing.
+
+`rider_f` (`rider_f.BP7jrp9H.glb`), `rider_n` (`rider_n.DZTihLVo.glb`) and
+`rider_low_lod` share the atlas. If the site ships a new hash, re-check the
+UVs against the template before replacing a file. To find the current names,
+fetch `https://biketerra.com/`, follow the `_app/immutable/` imports, and grep
+for `rider_[a-z_]*\.[A-Za-z0-9_-]+\.glb`.
 
 ## Render and check from the command line
 
@@ -95,7 +130,7 @@ first four, or `px,py,pz,tx,ty,tz`. The default is the four close views, and
 `BASIC=1` renders unlit. The rider faces +x, with the left arm at −z.
 `check.mjs` exits 1 on a warning: drawn texels with alpha under 255, or
 near-black texels outside the template (the front neckline V). The
-`jersey-design` skill in `~/Biketerra/.claude/skills/` covers the whole workflow.
+`jersey-design` skill (`skill/SKILL.md`) covers the whole workflow.
 
 ## One-offs
 
@@ -103,3 +138,8 @@ near-black texels outside the template (the front neckline V). The
 surface (straight sleeve and hem stripes, round logos, sliver triangles); its
 README covers what the UV map does to stripes and logos, which applies to any
 design.
+
+The others repaint the whole atlas in the settings page's stopped pose:
+`oneoff/chrono/` and `oneoff/biketerror/` redraw every PSD layer flat on the
+body, and `oneoff/rsc/` paints a jersey with no atlas at all, from a PDF
+mockup's panels and art.

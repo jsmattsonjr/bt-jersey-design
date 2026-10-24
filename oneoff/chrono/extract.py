@@ -1,4 +1,4 @@
-#!/Users/jmattson/Biketerra/.venv/bin/python
+#!/usr/bin/env python3
 """Export chrono.psd's art layers (cropped) and their atlas offsets.
 
     extract.py chrono.psd WORKDIR

@@ -20,7 +20,7 @@ import { readPNG, writePNG } from './png.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
-const atlasPath = process.argv[2] || join(root, '../../../design/jerseys/uv-straightness-guide.png');
+const atlasPath = process.argv[2] || join(root, 'design/jerseys/uv-straightness-guide.png');
 const outDir = process.argv[3] || null;
 if (outDir) mkdirSync(outDir, { recursive: true });
 

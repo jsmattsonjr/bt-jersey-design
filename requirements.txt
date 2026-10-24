@@ -1,0 +1,2 @@
+Pillow
+psd-tools

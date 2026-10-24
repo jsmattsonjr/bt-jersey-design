@@ -1,4 +1,4 @@
-#!/Users/jmattson/Biketerra/.venv/bin/python
+#!/usr/bin/env python3
 """Export the PSD layers the IRN-BRU scripts read, as 512x512 or layer-size PNGs.
 
     extract.py irn-bru-2.psd WORKDIR

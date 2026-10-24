@@ -6,7 +6,8 @@
 # back-close left-close right-close top) or px,py,pz,tx,ty,tz. Default: the four
 # close views. POSE=bind|stopped|seated|standing (default stopped, the settings
 # page's static pose) and T=seconds into the pedalling clips; BASIC=1 renders
-# unlit; SIZE sets each tile (700).
+# unlit; SIZE sets each tile (700). CHROME is the Chrome binary (default: the
+# macOS app); PYTHON a Python with Pillow (see python.zsh).
 set -e
 here=${0:A:h}
 atlas=${1:?usage: render.zsh ATLAS.png [OUT.png] [VIEW...]}
@@ -14,7 +15,8 @@ out=${2:-${atlas:r}-render.png}
 views=(${@[3,-1]})
 (( $#views )) || views=(front-close back-close left-close right-close)
 size=${SIZE:-700}
-chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+chrome=${CHROME:-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"}
+source $here/python.zsh
 
 # Serve a temp dir holding the app's files and a copy of the atlas.
 w=$(mktemp -d)
@@ -34,7 +36,7 @@ for v in $views; do
     "http://localhost:$port/render.html?atlas=atlas.png&view=$v&pose=${POSE:-stopped}&t=${T:-0}${BASIC:+&basic=1}" >/dev/null 2>&1
   tiles+=($t)
 done
-~/Biketerra/.venv/bin/python - $out $tiles <<'PY'
+$py - $out $tiles <<'PY'
 import sys
 from PIL import Image
 out, tiles = sys.argv[1], [Image.open(p) for p in sys.argv[2:]]

@@ -1,4 +1,4 @@
-#!/Users/jmattson/Biketerra/.venv/bin/python
+#!/usr/bin/env python3
 """Cut the art out of the MAKO mockup PDF as RGBA PNGs (ink colour, alpha
 from the contrast with the ground it sits on), at 600 dpi.
   extract.py IN.pdf WORKDIR"""
