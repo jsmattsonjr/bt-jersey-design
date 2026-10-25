@@ -12,6 +12,7 @@ stopped pose. Painting, position maps and the torso frame are
 ```zsh
 ./run.sh                                  # -> chasing-the-sun.png
 ./run.sh IN.jpg IN2.jpg OUT.png WORKDIR   # WORKDIR keeps the cut-out pieces
+DMS=1 ./run.sh                            # -> chasing-the-sun-dms.png: 51°48'36"N for 51.81°N
 ```
 
 Needs node and a Python with Pillow, numpy and scipy (`requirements.txt`).
@@ -23,6 +24,7 @@ seeded (`SEED`).
 | Script | What it does |
 |---|---|
 | `extract.py` | Cuts the pieces out. On the back view, the small AUTUMNAL EQUINOX and WINTER SOLSTICE labels are painted out: each label's box, including its drop shadow, is filled harmonically from its edge. Side flats: the text and logo are painted out of the background, and below the leaves the background is a straight-line fit across each row, smoothed. The side text is keyed out and refilled as solid off-white (the autumn text fades to peach, so it keys on the blue channel), turned to read left to right. Also extracts the side logos, 23 whole leaves from the shoulder flats, and the navy, collar and cuff colours. From the second mockup's snowy shoulder flat: the nebula with everything white painted out (normalised convolution) as a tile, and its 4 whole snowflakes and 206 stars. The shoulder flats' "2026" is not used. The WINTER SOLSTICE flat's autumn leaves are painted out too (it is all gradient), since they sat under the snowy shoulder. |
+| `dms.py` | Only with `DMS=1`. Paints the back view's 51.81°N out (harmonic fill, as for the labels) and sets the latitude in degrees, minutes and seconds in DIN Condensed Bold, ink (237,142,95) and a soft dark shadow, at the old cap height (39 px) and centred on the old text. It is narrowed to `LAT_MAXW` (160 px) to stay inside the pocket stitching. The font has no prime glyphs, so the marks are straight ' and ". `LAT` sets the value. |
 | `design.mjs` | The design (below). Settings are env vars, in cm. |
 
 ## The design, as built
