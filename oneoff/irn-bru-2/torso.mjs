@@ -3,7 +3,7 @@
 // around the old stripe; art layers from the PSD composited back on top.
 import { torsoMap } from './torsomap.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 const [,, inPath, outPath, artPath, textPath] = process.argv;
 const ORANGE = [245, 125, 25], BLUE = [10, 85, 195], WHITE = [255, 255, 255];
 const img = readPNG(inPath), art = readPNG(artPath), text = textPath ? readPNG(textPath) : null;
@@ -45,7 +45,7 @@ for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
 const out = Uint8ClampedArray.from(img.data);
 // Edge texels no triangle covers (the template's bleed) copy the nearest
 // covered texel in the same row, if the row's covered texels were repainted.
-const { templateMask } = await import(R + 'src/pipeline.js');
+const { templateMask } = await import(R + 'src/template.js');
 const tm = templateMask(readPNG(R + 'assets/jersey-mask.png'), S);
 for (let y = 224; y < 420; y++) for (let x = 0; x < S; x++) {
   const t = y*S + x; if (cnt[t] || !tm[t]) continue;

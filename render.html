@@ -43,7 +43,7 @@ const d = CLIP[pose] ? await pv.setPose('./assets/rider_low_lod.glb', CLIP[pose]
 const v = q.get('view') || 'three';
 if (VIEWS[v]) pv.look(VIEWS[v].map((p) => [p[0] + d.x, p[1] + d.y, p[2] + d.z]));
 else { const n = v.split(',').map(Number); pv.look([n.slice(0, 3), n.slice(3, 6)]); }
-// Let OrbitControls damping settle before the screenshot.
+// Let a frame or two draw before the screenshot.
 await new Promise((r) => setTimeout(r, 400));
 document.title = 'ready';
 </script></body></html>

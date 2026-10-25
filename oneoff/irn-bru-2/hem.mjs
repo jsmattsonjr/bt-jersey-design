@@ -4,9 +4,10 @@
 import { readFileSync } from 'node:fs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
-const { loadRig, templateMask } = await import(R + 'src/pipeline.js');
+const { loadRig } = await import(R + 'src/rig.js');
+const { templateMask } = await import(R + 'src/template.js');
 const { rasterTriangle } = await import(R + 'src/view.js');
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 const [,, inPath, outPath, artPath] = process.argv;
 const W = Number(process.env.W || 0.0118), WIN = 0.03;
 const ORANGE = [245, 125, 25], WHITE = [255, 255, 255];

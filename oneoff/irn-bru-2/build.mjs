@@ -3,9 +3,9 @@
 // the surface normal at its centre. Supersampled 4x per texel.
 import { sleeveMap } from './posmap.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 const { fillRegion } = await import(R + 'src/image.js');
-const { templateMask } = await import(R + 'src/pipeline.js');
+const { templateMask } = await import(R + 'src/template.js');
 const { Matrix3, Matrix4, Vector3 } = await import(R + 'vendor/three.module.js');
 
 const [,, inPath, outPath, logoPath] = process.argv;

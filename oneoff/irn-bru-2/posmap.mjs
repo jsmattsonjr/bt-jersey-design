@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
-const { loadRig } = await import(R + 'src/pipeline.js');
+const { loadRig } = await import(R + 'src/rig.js');
 const { rasterTriangle } = await import(R + 'src/view.js');
 const { Matrix4, Vector3 } = await import(R + 'vendor/three.module.js');
 

@@ -1,7 +1,6 @@
-// 3D preview: the rider as Biketerra draws it (bind pose or a site pose, nearest-filtered
-// 512 texture, palette row repainted), or in the A-pose used for the bake.
+// The rider as Biketerra draws it (bind pose or a site pose, nearest-filtered
+// 512 texture, palette row repainted), for render.html.
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Palette cells along the top 32 px row, 32 px each (applyRiderDesign):
@@ -23,9 +22,7 @@ export async function createPreview(container, glbUrl) {
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.05, 20);
   camera.position.set(2.6, 1.5, 0.9);
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0.15, 1.15, 0);
-  controls.enableDamping = true;
+  camera.lookAt(0.15, 1.15, 0);
 
   // The texture: a 512 canvas with the palette row and the jersey drawn as
   // the site does (jersey first, palette cells repainted on top).
@@ -44,31 +41,12 @@ export async function createPreview(container, glbUrl) {
   gltf.scene.traverse((o) => { if (o.isSkinnedMesh) { o.material = material; riding = o; } });
   scene.add(gltf.scene);
 
-  const aGeom = new THREE.BufferGeometry();
-  const aMesh = new THREE.Mesh(aGeom, material);
-  aMesh.visible = false;
-  scene.add(aMesh);
-
   function setJersey(imageData) {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, 512, 512);
     if (imageData) ctx.putImageData(imageData, 0, 0);
     PALETTE.forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(i * 32, 0, 32, 32); });
     texture.needsUpdate = true;
-  }
-
-  // posed: { position, normal } from the rig; index and uv from the GLB.
-  function setAPose(posed, glb) {
-    aGeom.setAttribute('position', new THREE.BufferAttribute(posed.position, 3));
-    aGeom.setAttribute('normal', new THREE.BufferAttribute(posed.normal, 3));
-    aGeom.setAttribute('uv', new THREE.BufferAttribute(glb.uv, 2));
-    if (glb.index) aGeom.setIndex(new THREE.BufferAttribute(glb.index, 1));
-    aGeom.computeBoundingSphere();
-  }
-
-  function showAPose(on) {
-    aMesh.visible = on;
-    gltf.scene.visible = !on;
   }
 
   // Pose the rider as the site's avatar preview does: rider_m rebound to the
@@ -104,21 +82,13 @@ export async function createPreview(container, glbUrl) {
   new ResizeObserver(resize).observe(container);
   resize();
 
-  // Named views for the toolbar.
-  const VIEWS = {
-    front: [[2.6, 1.3, 0], [0.1, 1.2, 0]],
-    back: [[-2.6, 1.3, 0], [0.1, 1.2, 0]],
-    side: [[0.3, 1.3, 2.6], [0.1, 1.2, 0]],
-    three: [[2.6, 1.5, 0.9], [0.15, 1.15, 0]],
-  };
-  // A named view, or [position, target] arrays.
-  function look(name) {
-    const [p, t] = Array.isArray(name) ? name : VIEWS[name];
+  // [position, target] arrays.
+  function look([p, t]) {
     camera.position.set(...p);
-    controls.target.set(...t);
+    camera.lookAt(...t);
   }
 
   setJersey(null);
-  renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
-  return { setJersey, setAPose, showAPose, setPose, look, riding };
+  renderer.setAnimationLoop(() => renderer.render(scene, camera));
+  return { setJersey, setPose, look, riding };
 }

@@ -9,9 +9,9 @@ import { sleeveMap } from '../chrono/posmap.mjs';
 import { POSE } from '../chrono/pose.mjs';
 import { frame, over, bleed, sub, dot, norm, cross } from '../chrono/decal.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 const { fillRegion } = await import(R + 'src/image.js');
-const { templateMask } = await import(R + 'src/pipeline.js');
+const { templateMask } = await import(R + 'src/template.js');
 const { Matrix3, Matrix4, Vector3 } = await import(R + 'vendor/three.module.js');
 
 const [,, inPath, outPath, work] = process.argv;

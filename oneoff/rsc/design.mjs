@@ -5,7 +5,7 @@
 // a pink top line on the back; the art from extract.py projected flat.
 //   node design.mjs WORKDIR OUT.png
 // Sizes in cm (env): PANEL 8.5, SLASH 1.2 (torso side of the armhole), CUFF 3, POCKET 2.9..14.5, PINK 0.6.
-import { readPNG } from '../../test/png.js';
+import { readPNG } from '../../src/png.js';
 import { paint, rig, glb, tm, SS, N } from './paint.mjs';
 import { body, bodyDir, O, U, F, L } from './frame.mjs';
 import { sub, dot, norm, cross, scale, rgbaAt } from '../chrono/decal.mjs';

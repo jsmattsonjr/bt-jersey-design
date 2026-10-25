@@ -1,8 +1,5 @@
 {
   "name": "jersey-projector",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node test/roundtrip.js"
-  }
+  "type": "module"
 }

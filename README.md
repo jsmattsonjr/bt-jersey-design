@@ -1,79 +1,28 @@
-# Jersey Projector
+# Biketerra jersey design
 
-Turns a front/back jersey mockup (the usual product render: two views side by
-side on a dark backdrop) into a Biketerra jersey UV map, by projecting each
-view onto the rider model and baking it into the atlas.
+Scripts and worked examples for painting a Biketerra jersey UV atlas with
+Claude Code. The atlas is distorted, so art drawn straight in it comes out
+bent on the rider. Each design is instead repainted from the 3D position of
+every texel, then rendered on the rider and looked at. The `jersey-design`
+skill (`skill/SKILL.md`) is the workflow, and `oneoff/` holds one script set
+per finished jersey to copy from.
 
-```bash
-cd jersey-projector
-python3 -m http.server 8000      # then open http://localhost:8000
-```
+## Shared modules
 
-Open one side-by-side image (front on the left), or two images (front first).
-The page finds both jerseys, fits the rider's arm angle to the mockup, aligns
-and bakes in about two seconds, and shows the result on the rider as the game
-draws it: riding pose, 512² texture, nearest filtering. **Download 512 PNG**
-is the file to upload on the settings Avatar tab.
+Plain ES modules in `src/`, run in node by the scripts:
 
-## What to check, and the controls
-
-- **Alignment panel.** The cyan line is the model's outline, carried into the
-  mockup by the warp; it should hug the jersey. The darkened area is what the
-  page took for backdrop.
-- **Landmarks (1–9)**: neck, sleeve hem corners, armpits, hem corners. Drag
-  one to the right spot and it snaps to the outline. *Reset points* undoes them.
-- **Add / Erase** brush the jersey mask. Use them where the jersey is the colour
-  of the backdrop: on the Chrono mockup a near-black panel and a cuff fade into
-  a backdrop within 8 levels, which no tolerance separates.
-- **Background tolerance** re-segments, discarding brush edits. PNGs with
-  transparency use their alpha instead.
-- **Arm angle / Fit to mockup**: the pose the rider is projected in. Fitting
-  runs on open and picks the angle whose landmarks best match (Procrustes).
-  **Arm twist** rolls the sleeves if their art lands rotated.
-- **Flatten shading** divides out the mockup's large-scale lighting (0 = off).
-- **Min facing**: surface turned more than this from a view (cosine) takes
-  no colour from it and is filled from its neighbours instead of smeared. The
-  *show unseen texels* box on the atlas marks those areas.
-
-## How it works
-
-All of the core runs on the CPU in plain ES modules (`src/`), so it runs
-unchanged in node for the tests. WebGL is only used for the preview.
-
-1. `glb.js`, `rig.js`: parse `assets/rider_m.glb`, re-pose the arms from the
-   riding bind pose into an A-pose, skin it (linear blend) on the CPU.
-   Jersey triangles are those whose UVs reach below the 32 px palette row.
-2. `view.js`: orthographic front (+x) and back (−x) views, rasterising a
-   silhouette and a depth buffer.
-3. `segment.js`: backdrop flood fill from the image border against a local
-   mean of the backdrop, which follows vignettes and glows; splits the views.
-4. `contour.js`: outline, landmarks (convexity defects for the armpits, sharpest
-   outboard turns for the sleeve hems) and arc-length correspondences between
-   landmarks.
-5. `tps.js`: a thin-plate spline from model-view pixels to mockup pixels, fitted
-   to those correspondences and tabulated on a 4 px grid.
-6. `pipeline.js`: the bake. Every jersey texel of a 1024² atlas is located on
-   the posed surface, and takes its colour from whichever view it faces and is
-   visible in. Each template island's unseen texels are then push-pull filled
-   from that island's seen ones. The result is halved to 512 and masked to
-   `assets/jersey-mask.png` (= `design/templates/jersey.png`, whose islands are
-   white *at alpha 0*: a canvas reads them as transparent black).
-
-## Tests
-
-```bash
-npm test     # node test/roundtrip.js
-```
-
-The round trip textures the rider with `design/jerseys/uv-straightness-guide.png`,
-renders it front and back as a "mockup", runs the whole pipeline on that, and
-compares with the guide: 0.67 levels mean error, nothing over 40 levels.
-`IDENTITY=1` replaces the warp with the exact map, to separate bake error from
-alignment error; `VIEW_WIDTH` sets the render size. Pass an output directory as
-the second argument to keep the renders and atlases.
-
-`?mockup=URL` (repeatable) on the page URL loads images at start, and `?arm=N`
-fixes the arm angle; the page state is `window.__jp`.
+- `glb.js`: parses `assets/rider_m.glb` (mesh, UVs, skin, clips).
+- `rig.js`: `loadRig` builds the skeleton, poses it from a clip
+  (`applyClip`; the site's stopped pose is `mount` at t=0 from
+  `rider_low_lod.glb`) and skins it on the CPU. Jersey triangles are those
+  whose UVs reach below the 32 px palette row.
+- `view.js`: `rasterTriangle`, for rasterising triangles into the atlas.
+- `template.js`: `templateMask`, the template islands (`assets/jersey-mask.png`
+  = `design/templates/jersey.png`, whose islands are white *at alpha 0*: a
+  canvas reads them as transparent black).
+- `image.js`: `fillRegion`, a push-pull fill of an island's unpainted texels.
+- `png.js`: PNG read and write.
+- `preview.js`: the WebGL rider used by `render.html` / `render.zsh`.
 
 ## Requirements
 
@@ -83,7 +32,7 @@ First fetch the rider models (they are not in the repo; see Model):
 ./fetch-assets.zsh
 ```
 
-- **node** 20 or later, for the scripts and tests (no npm packages; three.js is in `vendor/`).
+- **node** 20 or later, for the scripts (no npm packages; three.js is in `vendor/`).
 - **Google Chrome**, for `render.zsh` (headless). It defaults to the macOS app
   path; set `CHROME` to the binary elsewhere.
 - **Python 3 with `requirements.txt`** (Pillow, psd-tools), for the contact
@@ -104,7 +53,7 @@ First fetch the rider models (they are not in the repo; see Model):
 | `skill/SKILL.md` | The `jersey-design` Claude Code skill: the whole workflow, the model's distortions, recipes. Link it as `.claude/skills/jersey-design/SKILL.md` in the project you work from. |
 | `assets/` | The template mask, and the rider models once `fetch-assets.zsh` has downloaded them (ignored by git). |
 | `design/templates/jersey.png` | The jersey template; islands are white at alpha 0. Same file as `assets/jersey-mask.png`. |
-| `design/jerseys/` | Inputs and outputs of the one-offs, and the test's UV guide. |
+| `design/jerseys/` | Inputs and outputs of the one-offs. |
 | `oneoff/<name>/` | One script set per finished jersey; each `run.sh` rebuilds its PNG from `design/jerseys/` pixel for pixel. |
 
 ## Model

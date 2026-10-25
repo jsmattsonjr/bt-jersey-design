@@ -1,19 +1,19 @@
-// The rider's skeleton, re-posed from the riding bind pose into the A-pose a
-// jersey mockup is drawn in, and skinned on the CPU so the bake can use it.
+// The rider's skeleton, posed from a clip and skinned on the CPU, so a script
+// can find the 3D position of every jersey texel.
 //
 // Rig axes (rider_m.rb1Dgf6L, checked 2026-10-14): +y up, +x forward (the
 // hands reach the bars at x ~ 0.37), +z the rider's right. The torso is
-// already upright in the bind pose (spine x ~ -0.04 from y 0.99 to 1.48), so
-// only the arms move. The bind pose is not what the site shows: its avatar
-// preview poses rider_m with rider_low_lod.glb's clips (applyClip; stopped is
-// `mount` at t=0, torso leaning 24 deg forward).
+// upright in the bind pose (spine x ~ -0.04 from y 0.99 to 1.48), but the bind
+// pose is not what the site shows: its avatar preview poses rider_m with
+// rider_low_lod.glb's clips (applyClip; stopped is `mount` at t=0, torso
+// leaning 24 deg forward).
 import { Bone, Matrix4, Quaternion, Vector3 } from '../vendor/three.module.js';
 
 // Triangles whose UVs reach below the 32 px palette row (of 512) are jersey;
 // every other triangle samples a palette cell. No triangle straddles the row.
 export const PALETTE_ROW_V = 32 / 512;
 
-export function createRig(glb) {
+export function loadRig(glb) {
   const bones = glb.nodes.map((n) => {
     const b = new Bone();
     b.name = n.name;
@@ -67,34 +67,6 @@ export function createRig(glb) {
     update();
   }
 
-  const _q = new Quaternion(), _w = new Quaternion(), _p = new Quaternion();
-  const _a = new Vector3(), _b = new Vector3();
-
-  // Turn `bone` in world space so that the direction from it to `tip` becomes
-  // `target`, then spin it `twist` radians about that direction.
-  function aim(bone, tip, target, twist) {
-    _a.setFromMatrixPosition(tip.matrixWorld).sub(_b.setFromMatrixPosition(bone.matrixWorld)).normalize();
-    _q.setFromUnitVectors(_a, target);
-    if (twist) _q.premultiply(new Quaternion().setFromAxisAngle(target, twist));
-    bone.getWorldQuaternion(_w);
-    bone.parent.getWorldQuaternion(_p);
-    bone.quaternion.copy(_p.invert().multiply(_q.multiply(_w)));
-    update();
-  }
-
-  // armDeg: upper arm angle from straight down, out to the side.
-  // twistDeg: roll of the whole arm about its own axis, mirrored per side.
-  function pose({ armDeg = 40, twistDeg = 0 } = {}) {
-    reset();
-    const a = (armDeg * Math.PI) / 180;
-    for (const [side, s] of [['l', -1], ['r', 1]]) {
-      const target = new Vector3(0, -Math.cos(a), s * Math.sin(a)).normalize();
-      const tw = (s * twistDeg * Math.PI) / 180;
-      aim(byName.get(`upperArm.${side}`), byName.get(`forearm.${side}`), target, tw);
-      aim(byName.get(`forearm.${side}`), byName.get(`hand.${side}`), target, 0);
-    }
-  }
-
   // Linear blend skinning of every vertex: positions and normals in world space.
   function skin() {
     const mats = joints.map((b, j) => new Matrix4().multiplyMatrices(b.matrixWorld, inverseBind[j]).elements);
@@ -126,5 +98,5 @@ export function createRig(glb) {
   }
 
   update();
-  return { glb, bones: byName, index, jerseyTris: Uint32Array.from(jerseyTris), reset, pose, applyClip, skin };
+  return { glb, bones: byName, index, jerseyTris: Uint32Array.from(jerseyTris), reset, applyClip, skin };
 }

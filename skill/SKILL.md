@@ -73,7 +73,6 @@ Chrome, a Python with `requirements.txt`).
 cd jersey-projector
 ./render.zsh ATLAS.png [OUT.png] [VIEW...]     # rider wearing it, as the game draws it
 node check.mjs ATLAS.png [--map OUT.png]       # size, alpha, drawn texels outside the template
-python3 -m http.server                         # the interactive app (index.html)
 ```
 
 - **`render.zsh`** uses headless Chrome with no puppeteer. It writes a contact
@@ -86,10 +85,6 @@ python3 -m http.server                         # the interactive app (index.html
   the user will point at.
 - **`check.mjs`** exits 1 on warnings. The 7 translucent texels near (393–400,
   273) came with the IRN-BRU source.
-- **The projector app** (`index.html`) bakes a front/back product mockup onto
-  the atlas. It is fine for rough colour blocking. On Chrono the user judged the
-  result "not working out well", so for a design meant to look clean, use the
-  redraw approach below on a hand-laid atlas.
 
 ## Workflow
 

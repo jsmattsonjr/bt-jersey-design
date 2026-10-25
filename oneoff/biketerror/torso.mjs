@@ -11,9 +11,10 @@ import { frame, over, bleed, norm, sub } from '../chrono/decal.mjs';
 import { posed, at as boneAt } from '../chrono/pose.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
-const { loadRig, templateMask } = await import(R + 'src/pipeline.js');
+const { loadRig } = await import(R + 'src/rig.js');
+const { templateMask } = await import(R + 'src/template.js');
 const { fillRegion } = await import(R + 'src/image.js');
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 
 const [,, inPath, outPath, work] = process.argv;
 const PURPLE = [83, 54, 102], ORANGE = [245, 119, 19]; // Layer 1 and Layer 4

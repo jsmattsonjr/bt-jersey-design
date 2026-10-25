@@ -7,7 +7,7 @@
 import { torsoMap } from './torsomap.mjs';
 import { posed, POSE, at as boneAt } from '../chrono/pose.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 const [,, inPath, outPath, layerDir = '.'] = process.argv;
 const NAVY = [20, 22, 41], ORANGE = [245, 125, 25];
 const YC = 1.2933, HALF = 0.0059, HEM_W = 0.0118;

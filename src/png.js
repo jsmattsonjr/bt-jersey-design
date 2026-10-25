@@ -1,4 +1,4 @@
-// Node-only PNG I/O for the tests: 8- or 16-bit greyscale, RGB and RGBA, no
+// Node-only PNG I/O for the scripts: 8- or 16-bit greyscale, RGB and RGBA, no
 // interlace. 16-bit samples keep their high byte.
 import { inflateSync, deflateSync } from 'node:zlib';
 import { readFileSync, writeFileSync } from 'node:fs';

@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
 const { parseGLB } = await import(R + 'src/glb.js');
-const { loadRig } = await import(R + 'src/pipeline.js');
+const { loadRig } = await import(R + 'src/rig.js');
 const { rasterTriangle } = await import(R + 'src/view.js');
 // pose(rig) poses it (default: bind pose); the posed rig comes back as .rig.
 export function torsoMap(S = 512, ss = 1, pose = (rig) => rig.reset()) {

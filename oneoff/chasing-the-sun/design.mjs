@@ -16,7 +16,7 @@
 //   collar band.
 //   node design.mjs WORKDIR OUT.png
 import { readFileSync } from 'node:fs';
-import { readPNG } from '../../test/png.js';
+import { readPNG } from '../../src/png.js';
 import { paint, rig, glb, tm, sm, SS, N } from '../rsc/paint.mjs';
 import { body, bodyDir, O, U, F, L } from '../rsc/frame.mjs';
 import { sub, dot, norm, cross, scale, rgbaAt } from '../chrono/decal.mjs';

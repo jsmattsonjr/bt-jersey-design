@@ -4,7 +4,7 @@
 // own colours. SCALE=0.9 makes it 10% smaller than the old one's size.
 import { torsoMap } from './torsomap.mjs';
 const R = new URL('../../', import.meta.url).pathname; // jersey-projector root
-const { readPNG, writePNG } = await import(R + 'test/png.js');
+const { readPNG, writePNG } = await import(R + 'src/png.js');
 const [,, inPath, outPath, layerDir = '.'] = process.argv;
 const ORANGE = [245, 125, 25];
 const YC = 1.2933, HALF = 0.0059, HEM_W = 0.0118;

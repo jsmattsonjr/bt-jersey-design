@@ -5,9 +5,10 @@
 // paint dimmed, and drawn texels outside the template in magenta.
 import { readFileSync } from 'node:fs';
 import { parseGLB } from './src/glb.js';
-import { loadRig, templateMask } from './src/pipeline.js';
+import { loadRig } from './src/rig.js';
+import { templateMask } from './src/template.js';
 import { rasterTriangle } from './src/view.js';
-import { readPNG, writePNG } from './test/png.js';
+import { readPNG, writePNG } from './src/png.js';
 
 const args = process.argv.slice(2);
 const mapAt = args.indexOf('--map');
