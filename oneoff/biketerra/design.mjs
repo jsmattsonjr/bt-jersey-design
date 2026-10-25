@@ -270,10 +270,7 @@ function patchTBB(p, n, c) {
 function colour(q) {
   const { p } = q;
   if (segDist(p, seg.neck) < COLLAR) return col.orange;
-  // One front-panel triangle at the collar (842) has its UVs above the
-  // position maps' sleeve/torso split (v 0.45), so it comes as the right
-  // sleeve's; the sleeve islands end at x 320.
-  if (q.part === 't' || q.x >= 320) return patchTBB(p, q.n, torso(p));
+  if (q.part === 't') return patchTBB(p, q.n, torso(p));
   const c = sleeve(q.part, q.loc);
   return q.part === 'r' ? lettering(q.loc, c) : c;
 }

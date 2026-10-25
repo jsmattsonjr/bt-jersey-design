@@ -23,7 +23,11 @@ export const rig = sm.rig, glb = sm.glb;
 const invM = {}, rot = {};
 for (const s of ['l', 'r']) { invM[s] = new Matrix4().copy(rig.bones.get(`upperArm.${s}`).matrixWorld).invert(); rot[s] = new Matrix3().setFromMatrix4(invM[s]); }
 const v3 = new Vector3();
+// The position maps split sleeve from torso at v 0.45, which files the front
+// panel's two collar corners (triangles 841, 842, right of the sleeve
+// islands) as the right sleeve; paint those as torso.
 const sleevePt = (s, w, nw, x, y) => {
+  if (x >= 320) return { part: 't', p: w, n: norm(nw), x, y };
   v3.set(...w).applyMatrix4(invM[s]); const loc = [v3.x, v3.y, v3.z];
   v3.set(...nw).applyMatrix3(rot[s]).normalize(); const nl = [v3.x, v3.y, v3.z];
   return { part: s, p: w, n: norm(nw), loc, nl, x, y };

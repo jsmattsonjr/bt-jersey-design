@@ -59,6 +59,12 @@ Colours are the PDF's swatches: plum 2623Q (75,21,65), magenta 240Q
 
 ## Findings
 
+- The position maps split sleeve from torso at v 0.45, which files the front
+  panel's two collar corners (triangles 841 and 842, right of the sleeve
+  islands at x 320) as the right sleeve. `paint.mjs` paints them as torso
+  (2026-10-24). It changed none of this jersey's texels (the corners are
+  plum either way) but put the right shoulder's snow on Chasing the Sun's
+  left collar corner.
 - The sleeve islands are raglan-cut in the mesh and reach the collar. Their
   neck edge is an open boundary, so cuff edges must be filtered by height
   (u < 42 cm), or the cuff paints a pink fleck at the neck.

@@ -52,12 +52,10 @@ Rerunning reproduces the saved PNG pixel for pixel.
 
 ## Findings
 
-- Triangle 842 of `rider_m` (the front panel's corner at the collar) has its
-  UVs at v < 0.45, the position maps' sleeve/torso split, so `paint.mjs`
-  hands it over as the right sleeve, and it took the sleeve's purple
-  lettering. Here, sleeve texels at x ≥ 320 are painted as torso. The other
-  one-offs have the same triangle; fixing the split in `../chrono/` would
-  change their saved PNGs.
+- The front panel's two collar corners (triangles 841 and 842 of
+  `rider_m`) have their UVs at v < 0.45, the position maps' sleeve/torso
+  split, so they came as the right sleeve and took its purple lettering.
+  `../rsc/paint.mjs` now paints them as torso.
 - Wrapped with the view, the front TBB patch came out turned about 10°.
   Squared to the torso axis (spine.1 to neck) it was still 2.2° CCW from
   the front: in the stopped pose the torso leans a little sideways.
