@@ -73,5 +73,11 @@ seeded (`SEED`).
 - Measure a view's panel edges from the pixels, not by eye. The first
   guess was the jersey's outer outline, and the art then sampled the white
   page as a light streak along each panel.
+- The raglan seams too. The first seam tables, read by eye, ran up to 2 cm
+  outside the black seam line on the upper shoulders, so the art sampled the
+  line and the mockup's navy yoke beyond it. On the snowy right shoulder that
+  showed as a dark band at the front and a navy tongue on the back
+  (2026-10-25). The seams are now the line's inner edge, the narrower side,
+  less 6 px.
 - The mockup's own white lettering (BIKETERRA, CHASING) is at the 5.5
   texel/cm limit, so it renders blocky up close.

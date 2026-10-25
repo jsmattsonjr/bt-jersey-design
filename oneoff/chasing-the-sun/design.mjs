@@ -99,13 +99,15 @@ function arc(b) {
 }
 
 // The views, in image px. Seams and panel edges are half-widths from the
-// centre line at image rows (left and right averaged), read off the mockup.
+// centre line at image rows. Seams are the inner edge of the black seam line
+// (the narrower side), less 6 px, so the art never samples the line or the
+// mockup's yoke beyond it; panel edges are left and right averaged.
 const lerp = (tab, y) => { if (y <= tab[0][0]) return tab[0][1]; for (let i = 1; i < tab.length; i++) if (y <= tab[i][0]) { const [y0, v0] = tab[i-1], [y1, v1] = tab[i]; return v0 + (v1 - v0) * (y - y0) / (y1 - y0); } return tab.at(-1)[1]; };
 const VIEW = {
   F: { cx: 737, collar: 318, hem: (x) => 1160 + 35 * ((x - 737) / 265) ** 2, armY: 555,
-    seam: [[270, 138], [310, 215], [350, 265], [400, 295], [450, 310], [500, 315], [555, 316]], edge: [[555, 316], [650, 289], [700, 280], [800, 268], [900, 262], [1180, 263]] },
+    seam: [[270, 103], [290, 131], [310, 176], [330, 208], [350, 232], [370, 253], [390, 268], [410, 280], [430, 289], [450, 295], [470, 300], [490, 303], [510, 306], [530, 307], [550, 306], [555, 304]], edge: [[555, 316], [650, 289], [700, 280], [800, 268], [900, 262], [1180, 263]] },
   B: { cx: 1748, collar: 225, hem: (x) => 1285 - 75 * ((x - 1748) / 280) ** 2, armY: 555,
-    seam: [[225, 100], [260, 188], [300, 245], [350, 285], [400, 305], [450, 312], [500, 315], [555, 318]], edge: [[555, 318], [650, 290], [700, 281], [800, 268], [900, 258], [1100, 254], [1200, 252]] },
+    seam: [[235, 95], [255, 126], [275, 159], [295, 190], [315, 217], [335, 240], [355, 259], [375, 274], [395, 286], [415, 295], [435, 302], [455, 307], [475, 310], [495, 312], [515, 312], [535, 312], [555, 308]], edge: [[555, 318], [650, 290], [700, 281], [800, 268], [900, 258], [1100, 254], [1200, 252]] },
 };
 const hemDist = (p) => segDist(p, seg.hem);
 { // px per m: collar to hem down the centre line
