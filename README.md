@@ -154,4 +154,7 @@ body. `oneoff/rsc/` paints a jersey with no atlas at all, from a PDF
 mockup's panels and art. `oneoff/chasing-the-sun/` does the same from a
 raster image mockup (front and back views, side and shoulder flats),
 mapping the views by arc length and scattering the flats' leaves and
-snowflakes as sprites.
+snowflakes as sprites. `oneoff/biketerra/` works from just a front and a
+back product view: seams painted out, the views wrapped by arc length, the
+flanks filled with their ground patterns, and the sleeve lettering and
+chest patch redrawn flat.
