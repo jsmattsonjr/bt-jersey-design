@@ -157,4 +157,6 @@ mapping the views by arc length and scattering the flats' leaves and
 snowflakes as sprites. `oneoff/biketerra/` works from just a front and a
 back product view: seams painted out, the views wrapped by arc length, the
 flanks filled with their ground patterns, and the sleeve lettering and
-chest patch redrawn flat.
+chest patch redrawn flat. `oneoff/turtle/` paints a plain raglan jersey
+and lifts only the art off two views, placing each piece by arc length
+and height up the torso axis, so pieces can be moved and scaled on their own.
