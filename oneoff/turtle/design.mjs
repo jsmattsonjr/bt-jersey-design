@@ -14,7 +14,7 @@
 //   node design.mjs WORKDIR OUT.png
 // Sizes in cm (env): NECKF 6.5, NECKB 5 (where the raglan seam's plane
 // leaves the neck, front and back, out from the centre line), BOW 3.5,
-// NECK_IN 8, NECK_TOP 0.3 (a fraction, neck to armpit), BACK_DOWN 7.9.
+// NECK_OUT 0, NECK_TOP 0.35 (a fraction, neck to armpit), BACK_DOWN 7.9.
 import { readFileSync } from 'node:fs';
 import { readPNG } from '../../test/png.js';
 import { paint, rig, glb, tm, N } from '../rsc/paint.mjs';
@@ -59,22 +59,25 @@ for (const s of ['l', 'r']) armpit[s] = seg['arm' + s].flat().sort((a, b) => bod
 // Raglan seam (as ../rsc/design.mjs): a plane per side through the neck at
 // the side, front and back, and the armpit, bowed BOW out toward the
 // shoulder halfway down, as the views draw it; the shoulder side is yoke.
-// On the back the plane ran nearly straight down from the neck, leaving a
-// tab of green that the views' collar covers. There the seam is also drawn
-// in NECK_IN toward the centre at the neck, easing off over the top
-// NECK_TOP of the way down, so the curve carries on up to the neckline.
+// The bow is measured down from the neck: on the back from the back neck,
+// which is 2 cm higher than the front's. Measured from the front's, the
+// bow was zero over the top 2 cm of the back, and the seam ran straight
+// down from the neckline as a tab. NECK_OUT pushes the back seam further
+// out just below the neck, over the top NECK_TOP of the way down.
 const NECKF = cm('NECKF', 6.5), NECKB = cm('NECKB', 5), BOW = cm('BOW', 3.5);
-const NECK_IN = cm('NECK_IN', 8), NECK_TOP = Number(process.env.NECK_TOP ?? 0.3);
+const NECK_OUT = cm('NECK_OUT', 0), NECK_TOP = Number(process.env.NECK_TOP ?? 0.35);
+const UNECKB = Math.max(...seg.neck.flat().filter((p) => body(p)[0] < 0).map((p) => body(p)[1]));
+console.log('neck height, back', (UNECKB * 100).toFixed(1), 'cm');
 const ragl = {};
 for (const s of ['l', 'r']) {
   const sg = s === 'l' ? 1 : -1, toW = (b) => [0,1,2].map((i) => O[i] + b[0]*F[i] + b[1]*U[i] + b[2]*L[i]);
   const nf = toW([0.03, 0.505, sg * NECKF]), nb = toW([-0.015, 0.525, sg * NECKB]), a = armpit[s];
   let n = norm(cross(sub(nb, nf), sub(a, nf)));
   if (dot(n, sub(toW([0.03, 0.45, sg * 0.15]), nf)) < 0) n = scale(n, -1);
-  const u0 = body(nf)[1], u1 = body(a)[1];
-  ragl[s] = (p) => { const b = body(p), t = Math.max(0, Math.min(1, (u0 - b[1]) / (u0 - u1)));
-    const back = Math.max(0, Math.min(1, -b[0] / 0.05)), top = Math.max(0, 1 - t / NECK_TOP);
-    return dot(n, sub(p, nf)) - BOW * 4 * t * (1 - t) + NECK_IN * back * top * top; };
+  const u1 = body(a)[1], uF = body(nf)[1], uB = UNECKB;
+  ragl[s] = (p) => { const b = body(p), back = Math.max(0, Math.min(1, -b[0] / 0.05)), u0 = uF + (uB - uF) * back;
+    const t = Math.max(0, Math.min(1, (u0 - b[1]) / (u0 - u1))), k = Math.min(1, t / NECK_TOP);
+    return dot(n, sub(p, nf)) - BOW * 4 * t * (1 - t) - NECK_OUT * back * 27 / 4 * k * (1 - k) ** 2; };
 }
 
 // Arc length round the torso (as ../biketerra/design.mjs). Per 5 mm of

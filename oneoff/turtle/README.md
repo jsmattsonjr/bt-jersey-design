@@ -28,10 +28,11 @@ Rerunning reproduces the saved PNG pixel for pixel.
 - **Body** green (50,100,70), collar included, as in the views. **Yoke
   and sleeves** teal (34,136,136) beyond a raglan plane through the side of
   the neck (`NECKF` 6.5 front, `NECKB` 5 back) and the armpit, bowed `BOW`
-  3.5 out toward the shoulder halfway down. On the back the seam is also
-  pulled `NECK_IN` 8 toward the centre at the neck, easing off over the top
-  `NECK_TOP` 0.3 of the way to the armpit, so the green ends in a dome below
-  the neck and the yoke runs across the back of the neck.
+  3.5 out toward the shoulder halfway down. The bow is measured from each
+  side's own neck height (the back's is 2 cm higher), so the back seam
+  leaves the neckline 5.25 cm either side of centre (the back view's
+  collar: 4.4) heading out toward the shoulder. `NECK_OUT` (0) and
+  `NECK_TOP` (0.35) can push it further out just below the neck.
 - **Art** is laid on the torso by arc length round it from the centre line
   (across) and height along the torso axis (up). Each view is at its own
   scale, collar to hem down the centre line: 31.4 px/cm front, 31.7 back.
@@ -50,13 +51,21 @@ Rerunning reproduces the saved PNG pixel for pixel.
 - Measured as 3D distance from the hem, rows arched on the back, lifting the
   ends of the lettering into the yoke, because the hem is higher at centre
   back. Height along the torso axis keeps them level.
-- Without the pull-in, the back plane ran nearly straight down from the
-  neck, leaving a tab of green there. On the views the collar band covers
-  that spot, so with no collar it should be yoke. Moving the plane's back
-  neck point in only narrowed the tab and moved the front seam. Measuring
-  the back seam as arc length round the torso failed too: above the
-  armpits the section is open, and the seam came out jagged and too far
-  out.
+- With the bow measured from the front neck height, it was zero over the
+  top 2 cm of the back, and the back seam ran straight down from the
+  neckline: a tab of green with vertical sides. Taking the back's own neck
+  height fixed it. The views' collar is sewn on above the neckline, so the
+  back panel does reach the neck between the seams; it is the tab's shape,
+  not its colour, that was wrong. On the way: pulling the seam in to the
+  centre back made a dome (matches neither view nor template); moving the
+  plane's back neck point in narrowed the tab and moved the front seam; arc
+  length above the armpits (an open section) made the seam jagged.
+- Biketerra's template (`biketerra-jersey-template.png`, RAGLAN guides)
+  agrees with this seam on the front (neck 6.4 cm out, ours 6.5) and on the
+  back from the armpit to the shoulder blade (13.5 vs 13.3). Above that the
+  template's back line runs up to the shoulder top 14 cm out, not to the
+  neck, and does not meet its front line: a raglan front with a set-in
+  back. This follows the views instead.
 - With `BOW` 2.5 the yoke clipped the back lettering's "b"; 3.5 clears it and
   is closer to the views' curved seam.
 - From back-close, the back lettering still looks slightly arched. That is
