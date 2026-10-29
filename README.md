@@ -22,8 +22,6 @@ Plain ES modules in `src/`, run in node by the scripts:
   canvas reads them as transparent black).
 - `image.js`: `fillRegion`, a push-pull fill of an island's unpainted texels.
 - `png.js`: PNG read and write.
-- `pcm.js`: the Pro Cycling Manager rider and its correspondence with
-  Biketerra's (see PCM kits).
 - `preview.js`: the WebGL rider used by `render.html` / `render.zsh`.
 
 ## Requirements
@@ -45,8 +43,7 @@ First fetch the rider models (they are not in the repo; see Model):
   ```zsh
   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
   ```
-- **curl** and **shasum**, for `fetch-assets.zsh` and `fetch-pcm.zsh`.
-  `fetch-pcm.zsh` also needs UnityPy (in `requirements.txt`).
+- **curl** and **shasum**, for `fetch-assets.zsh`.
 - **poppler** (`pdftoppm`), only for `oneoff/rsc`, which reads a PDF mockup.
 
 ## Layout
@@ -95,55 +92,12 @@ near-black texels outside the template (the front neckline V). The
 
 ## PCM kits
 
-`pcm2bt.mjs` converts a Pro Cycling Manager kit (`<team>_maillot`, the
-classic layout: 455×313 up to PCM12, the same map at 910×626 from PCM13) into
-a Biketerra jersey atlas, dropping the shorts:
-
-```zsh
-./fetch-pcm.zsh                       # once: the PCM rider, into assets/
-node pcm2bt.mjs KIT.png OUT.png       # about 20 s
-./render.zsh OUT.png
-```
-
-Kits for UE5 / modern PCM use another map and are out of scope.
-
-**The PCM rider** is Cyanide's, so the repo does not carry it either.
-`fetch-pcm.zsh` downloads PCM.daily's old Unity shirt viewer
-(`shirtdb/viewer/Jview_v16.unity3d`, Unity 2.5) from the Wayback Machine
-(snapshot 20120505101225), checks its SHA-256, and runs `pcm-extract.py`
-(UnityPy; it has no Texture2D class for Unity 2.5, so the DXT textures are
-decoded by hand). That writes `assets/pcm_cyclist.json`, the
-`cyclist_jersey` skinned mesh (610 vertices, 870 triangles from a strip, 12
-biped bones, z up, facing −y, torso leaning ~58°), and
-`assets/pcm_default.png`, the 455×313 kit it shipped with. The mesh is
-jersey and shorts in one surface, front and back as two UV islands; the hem
-is the edge loop at kit row 341.5 of 626. The mesh's x is mirrored (the L
-bones are at −x), so every direction is taken from bone names, never a cross
-product: the LKHC kit's lettering reads correctly on Biketerra's rider.
-
-**Correspondence** (`src/pcm.js`): the two UV maps are unrelated, so each
-rider gets the same normalised coordinates, measured on its own mesh:
-θ round the torso centre line (hem centroid to neck centroid) and elevation
-angle e from its midpoint, scaled per θ hem 0 to neckline 1; per sleeve, φ
-round the joint-to-cuff axis (0 out from the body, + forward) and s along
-it, scaled per φ from the sleeve's floor to the cuff. Sleeve and torso are
-split the same way on both, where the upper-arm skin weight passes 0.5,
-since the UV islands split them in different places. Both riders are then
-laid on one canonical body, the torso on a cylinder and the arms held out
-sideways, blended by that weight across the armhole, and each Biketerra
-subsample takes the UV of the closest point on PCM's (a voxel hash of the
-PCM triangles cut 3×3). The kit is sampled bilinearly over the pixels
-PCM's triangles touch only, so the gutters between islands never bleed in.
-`paint()` (`oneoff/rsc/paint.mjs`) does the supersampling, slivers and
-bleed, in the stopped pose. `DEBUG=1` also writes the canonical position as
-colour for both riders (`OUT-coords.png`; `OUT-pcmcoords.png` in kit
-space); converting the second should reproduce the first.
-
-Earlier tries, for the record: per-part lookup grids with the UV islands as
-Biketerra's sleeve split left torso-coloured patches on the underarms; with
-the 0.5 contour as the armhole, PCM's contour was too ragged (t swinging
-−9 to +6 cm in 20° of φ); and grids with a fallback between parts made
-comb-edged shards along the armhole, where PCM's (φ, s) folds.
+The Pro Cycling Manager kit converter now lives in its own repo,
+[pcm2bt](https://github.com/jsmattsonjr/pcm2bt) (`../pcm2bt` locally).
+It carries copies of the modules it shares with this one (`src/glb.js`,
+`rig.js`, `view.js`, `template.js`, `image.js`, `png.js`, `preview.js`, the
+position maps from `oneoff/chrono/` and `paint()` from `oneoff/rsc/`), so a fix
+to one of them here has to be carried over by hand.
 
 ## One-offs
 

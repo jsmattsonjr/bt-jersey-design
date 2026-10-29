@@ -2,4 +2,3 @@ Pillow
 psd-tools
 numpy
 scipy
-UnityPy
